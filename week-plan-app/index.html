@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Week Plan — 周计划</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- 引导页 -->
+    <div id="onboarding" class="onboarding">
+      <div class="onboarding-card">
+        <div class="onboarding-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <rect x="6" y="8" width="36" height="32" rx="4" stroke="currentColor" stroke-width="1.5" />
+            <line x1="6" y1="16" x2="42" y2="16" stroke="currentColor" stroke-width="1.5" />
+            <line x1="16" y1="8" x2="16" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="32" y1="8" x2="32" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+            <circle cx="18" cy="12" r="1.5" fill="currentColor" />
+          </svg>
+        </div>
+        <h1 class="onboarding-title">Week Plan</h1>
+        <p class="onboarding-desc">
+          选择一个文件夹作为你的计划目录<br />
+          应用将自动读取和保存每周计划文件
+        </p>
+        <button id="btn-select-dir" class="btn btn-download">
+          选择计划目录
+        </button>
+        <p class="onboarding-hint">
+          需要 Chrome 或 Edge 浏览器 · 文件保存在本地
+        </p>
+      </div>
+    </div>
+
+    <!-- 主界面（初始隐藏） -->
+    <div id="main-app" class="main-app hidden">
+      <!-- 顶部导航 -->
+      <header class="top-bar">
+        <button id="btn-drawer-toggle" class="btn btn-icon" aria-label="菜单">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <line x1="3" y1="4.5" x2="15" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="3" y1="9" x2="15" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="3" y1="13.5" x2="15" y2="13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+        <div id="week-selector-container" class="week-selector-container"></div>
+        <div class="top-bar-spacer"></div>
+      </header>
+
+      <!-- 主内容 -->
+      <main id="week-content" class="week-content"></main>
+    </div>
+
+    <!-- 抽屉遮罩 -->
+    <div id="drawer-overlay" class="drawer-overlay hidden"></div>
+    <!-- 抽屉面板 -->
+    <aside id="drawer" class="drawer">
+      <div class="drawer-header">
+        <span class="drawer-title">所有周计划</span>
+        <button id="btn-drawer-close" class="btn btn-icon" aria-label="关闭">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="13" y1="3" x2="3" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div id="drawer-timeline" class="drawer-timeline"></div>
+      <div class="drawer-actions">
+        <button id="btn-new-week" class="btn btn-primary btn-full">+ 新建周计划</button>
+        <button id="btn-import-md" class="btn btn-secondary btn-full">导入 Markdown</button>
+        <button id="btn-export-all" class="btn btn-secondary btn-full">导出全部</button>
+        <button id="btn-change-dir" class="btn btn-tertiary-text btn-full">更换数据目录</button>
+      </div>
+    </aside>
+
+    <!-- 创建新周 Modal -->
+    <div id="create-modal-overlay" class="modal-overlay hidden"></div>
+    <div id="create-modal" class="modal hidden">
+      <div class="modal-header">
+        <h3 class="modal-title">新建周计划</h3>
+        <button id="btn-modal-close" class="btn btn-icon" aria-label="关闭">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <line x1="3" y1="3" x2="13" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="13" y1="3" x2="3" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="modal-week-start">周一日期</label>
+          <input type="date" id="modal-week-start" class="form-input" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">数据来源</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="source" value="clone" checked />
+              <span class="radio-label">从上周复制</span>
+              <span class="radio-desc">复制任务结构和决策，日期偏移+7天</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="source" value="blank" />
+              <span class="radio-label">空白模板</span>
+              <span class="radio-desc">创建全新的空周计划</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="source" value="template" />
+              <span class="radio-label">预设模板</span>
+              <span class="radio-desc">使用"纯开发周"默认模板</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-modal-cancel" class="btn btn-secondary">取消</button>
+        <button id="btn-modal-confirm" class="btn btn-primary">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
