@@ -75,7 +75,8 @@ class Store {
         const data = parseWeekPlan(content);
         data.filename = name;
         data._fileHandle = handle;
-        const key = data.weekStart ? formatDate(data.weekStart) : name;
+        const validDate = data.weekStart && !isNaN(data.weekStart.getTime());
+        const key = validDate ? formatDate(data.weekStart) : name;
         this._weeks.set(key, data);
       } catch (err) {
         console.error(`解析文件失败: ${name}`, err);

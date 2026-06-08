@@ -62,7 +62,7 @@ const DAY_TYPE_CN = {
 function generateFrontmatter(data) {
   const lines = ['---'];
 
-  lines.push(`weekStart: ${formatDate(data.weekStart)}`);
+  lines.push(`weekStart: ${data.weekStart && !isNaN(data.weekStart.getTime()) ? formatDate(data.weekStart) : ''}`);
   lines.push(`status: ${data.status || 'planning'}`);
 
   if (data.title) {
@@ -128,7 +128,9 @@ function generateBody(data) {
   const lines = [];
 
   // 标题
-  const title = data.title || `周计划 ${formatWeekRange(data.weekStart)}`;
+  const title = data.title || (data.weekStart && !isNaN(data.weekStart.getTime())
+    ? `周计划 ${formatWeekRange(data.weekStart)}`
+    : '周计划');
   lines.push(`# 📋 ${title}`);
   lines.push('');
 

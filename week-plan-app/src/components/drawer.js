@@ -127,7 +127,9 @@ async function importMarkdown() {
     const md = generateMarkdown(data);
     await writeFile(file.name, md);
     await store.loadAll();
-    const key = data.weekStart ? data.weekStart.toISOString().slice(0, 10) : file.name;
+    const key = (data.weekStart && !isNaN(data.weekStart.getTime()))
+      ? formatDate(data.weekStart)
+      : file.name.replace(/\.md$/, '');
     store.setCurrentWeek(key);
   } catch (err) {
     if (err.name !== 'AbortError') {

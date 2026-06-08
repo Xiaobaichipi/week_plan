@@ -239,12 +239,15 @@ export function parseWeekPlan(markdown, fallbackWeekStart = null) {
   // 确保 risks 存在
   const risks = frontmatter.risks || [];
 
-  // 周起始日期
+  // 周起始日期（验证有效性）
   let weekStart = null;
   if (frontmatter.weekStart) {
-    weekStart = new Date(frontmatter.weekStart + 'T00:00:00');
-  } else if (fallbackWeekStart) {
-    weekStart = new Date(fallbackWeekStart);
+    const d = new Date(frontmatter.weekStart + 'T00:00:00');
+    weekStart = isNaN(d.getTime()) ? null : d;
+  }
+  if (!weekStart && fallbackWeekStart) {
+    const d = new Date(fallbackWeekStart);
+    weekStart = isNaN(d.getTime()) ? null : d;
   }
 
   return {
