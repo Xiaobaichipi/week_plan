@@ -823,3 +823,109 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Body Content (Markdown rendered) ── */
+
+.body-content {
+  font-size: var(--text-body-md);
+  line-height: var(--leading-body);
+  color: var(--color-body);
+}
+
+.body-content h1,
+.body-content h2,
+.body-content h3,
+.body-content h4 {
+  color: var(--color-ink);
+  font-weight: var(--weight-normal);
+  margin-top: var(--space-xl);
+  margin-bottom: var(--space-sm);
+}
+
+.body-content .body-h1 {
+  font-size: var(--text-display-sm);
+  letter-spacing: var(--track-display-sm);
+}
+
+.body-content .body-h2 {
+  font-size: var(--text-title-md);
+  font-weight: var(--weight-semibold);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.body-content .body-h3 {
+  font-size: var(--text-title-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.body-content p {
+  margin-bottom: var(--space-base);
+}
+
+.body-content .body-hr {
+  border: none;
+  border-top: 1px solid var(--color-hairline);
+  margin: var(--space-lg) 0;
+}
+
+.body-content .body-blockquote {
+  border-left: 3px solid var(--color-hairline-strong);
+  padding: var(--space-xs) var(--space-base);
+  margin: var(--space-base) 0;
+  color: var(--color-muted);
+}
+
+.body-content .body-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-base);
+  font-size: var(--text-body-sm);
+}
+
+.body-content .body-table th,
+.body-content .body-table td {
+  text-align: left;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-hairline);
+}
+
+.body-content .body-table th {
+  background-color: var(--color-canvas-soft);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink);
+}
+
+.body-content .body-code {
+  display: block;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-base);
+  margin-bottom: var(--space-base);
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  line-height: var(--leading-code);
+  overflow-x: auto;
+}
+
+.body-content .body-inline-code {
+  font-family: var(--font-mono);
+  font-size: var(--text-code);
+  background-color: var(--color-surface-strong);
+  padding: 1px 4px;
+  border-radius: var(--rounded-xs);
+}
+
+.body-content strong {
+  color: var(--color-ink);
+}
+
+.body-content a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.body-content a:hover {
+  text-decoration: underline;
+}

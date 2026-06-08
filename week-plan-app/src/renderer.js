@@ -11,6 +11,7 @@ import * as TimeGrid from './components/timeGrid.js';
 import * as TaskList from './components/taskList.js';
 import * as DecisionTable from './components/decisionTable.js';
 import * as RiskList from './components/riskList.js';
+import * as BodyViewer from './components/bodyViewer.js';
 import * as Drawer from './components/drawer.js';
 import * as CreateModal from './components/createModal.js';
 
@@ -48,6 +49,7 @@ export function initUI() {
 
     <div id="section-decisions"></div>
     <div id="section-risks"></div>
+    <div id="section-body"></div>
   `;
 
   // 初始化各组件
@@ -56,6 +58,7 @@ export function initUI() {
   TaskList.init(document.getElementById('tasklist-container'));
   DecisionTable.init(document.getElementById('section-decisions'));
   RiskList.init(document.getElementById('section-risks'));
+  BodyViewer.init(document.getElementById('section-body'));
 
   // 监听周切换 → 播放动画
   store.subscribe((event) => {
