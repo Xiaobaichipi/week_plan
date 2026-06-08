@@ -160,6 +160,9 @@ function extractFrontmatter(markdown) {
 
 /**
  * 从 Markdown body 中解析天数信息（兼容无 frontmatter 的旧格式）
+ * 支持两种表格格式：
+ *   1. 按行（日=行）：第一列含周X
+ *   2. 按列（日=列）：表头行含周X，数据行按列对应
  * @param {string} body
  * @returns {Array}
  */
@@ -169,26 +172,131 @@ function parseDaysFromBody(body) {
   const tables = body.match(tableRegex);
   if (!tables) return days;
 
+  // 收集所有表格行
+  const allRows = [];
   for (const row of tables) {
     const cells = row.split('|').filter(c => c.trim());
     if (cells.length < 3) continue;
-    // 跳过表头
-    if (cells[0].trim().startsWith('**类型**') || cells[0].trim().startsWith('---')) continue;
+    allRows.push(cells.map(c => c.replace(/\*\*/g, '').trim()));
+  }
 
-    const dayLabel = cells[0].replace(/\*\*/g, '').trim();
-    const typeLabel = cells[1].replace(/\*\*/g, '').trim();
-    const taskLabel = cells[2].replace(/\*\*/g, '').trim();
+  if (allRows.length === 0) return days;
 
-    const weekdayMatch = dayLabel.match(/周[一二三四五六日]/);
+  // 判断格式：第一行第一个单元格是否含周X
+  const firstCell = allRows[0][0];
+  if (/周[一二三四五六日]/.test(firstCell)) {
+    // 格式 1：行式（日=行）
+    return parseRowOriented(allRows);
+  }
+
+  // 格式 2：列式（日=列）— 表头行含周X
+  return parseColumnOriented(allRows);
+}
+
+/**
+ * 行式解析：每行 = 一天
+ * | **周一** | 💻 代码 | 画布 MVP |
+ */
+function parseRowOriented(rows) {
+  const days = [];
+  for (const cells of rows) {
+    if (cells[0].startsWith('---')) continue;
+    if (cells[0].startsWith('类型') && !/[周一二三四五六日]/.test(cells[0])) continue;
+
+    const weekdayMatch = cells[0].match(/周[一二三四五六日]/);
     if (!weekdayMatch) continue;
 
+    const typeLabel = (cells[1] || '');
+    const taskLabel = (cells[2] || '');
+
     days.push({
-      weekday: weekdayMatch[0],
       label: taskLabel !== '-' ? taskLabel : '',
-      type: TYPE_MAP[typeLabel] || 'off',
+      type: TYPE_MAP[typeLabel] || inferType(typeLabel) || 'off',
     });
   }
   return days;
+}
+
+/**
+ * 列式解析：表头行含周X，每行=一种类别
+ * | | 周一 06/08 | 周二 06/09 | ... |
+ * | **类型** | 💻 代码 | 💻 代码 | ... |
+ * | **DDLabs** | 画布 MVP | Docker + README | ... |
+ */
+function parseColumnOriented(rows) {
+  if (rows.length < 2) return [];
+
+  // 查找表头行（含周X）
+  let headerIdx = -1;
+  for (let i = 0; i < rows.length; i++) {
+    const cells = rows[i];
+    const weekdayCount = cells.filter(c => /周[一二三四五六日]/.test(c)).length;
+    if (weekdayCount >= 3) {
+      headerIdx = i;
+      break;
+    }
+  }
+  if (headerIdx < 0) return [];
+
+  // 从表头提取每天的类型和标签
+  const header = rows[headerIdx];
+  const dayMap = []; // [{weekday: '周一', colIdx: 1}, ...]
+  for (let i = 1; i < header.length; i++) {
+    const m = header[i].match(/周[一二三四五六日]/);
+    if (m) {
+      dayMap.push({ weekday: m[0], colIdx: i });
+    }
+  }
+
+  // 初始化每天的数据
+  const dayData = dayMap.map(d => ({ label: '', type: 'off', weekday: d.weekday }));
+
+  // 解析数据行
+  const TYPE_ROW_LABELS = ['类型', 'type'];
+  for (const cells of rows) {
+    if (cells === rows[headerIdx]) continue;
+    if (cells[0].startsWith('---')) continue;
+    if (cells.length < 2) continue;
+
+    const rowLabel = cells[0].toLowerCase();
+
+    // 类型行
+    if (TYPE_ROW_LABELS.some(l => rowLabel.includes(l))) {
+      for (const dm of dayMap) {
+        const val = cells[dm.colIdx] || '';
+        dayData[dayMap.indexOf(dm)].type = TYPE_MAP[val] || inferType(val) || 'off';
+      }
+      continue;
+    }
+
+    // 内容行（DDLabs、视频 等） — 填充 label
+    for (const dm of dayMap) {
+      const val = cells[dm.colIdx] || '';
+      if (val && val !== '-') {
+        const idx = dayMap.indexOf(dm);
+        if (dayData[idx].label) {
+          dayData[idx].label += ' / ' + val;
+        } else {
+          dayData[idx].label = val;
+        }
+      }
+    }
+  }
+
+  return dayData.map(d => ({ label: d.label, type: d.type }));
+}
+
+/**
+ * 从包含 emoji 和中文字符的类型字符串推断类型
+ */
+function inferType(label) {
+  if (!label) return null;
+  if (/代码|💻|开发|code|画布|MVP|Docker/i.test(label)) return 'code';
+  if (/制作|🎬|视频|脚本|剪辑|录制|content/i.test(label)) return 'content';
+  if (/出差|🚄|travel|杭州/i.test(label)) return 'travel';
+  if (/培训|🏢|training/i.test(label)) return 'training';
+  if (/休息|😴|off/i.test(label)) return 'off';
+  return null;
 }
 
 /**

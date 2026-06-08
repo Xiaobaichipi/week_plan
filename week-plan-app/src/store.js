@@ -199,6 +199,12 @@ class Store {
   async updateDay(dayIndex, data) {
     if (!this._current) return;
     if (!this._current.days) this._current.days = [];
+    // 自动填充 date（从 weekStart + dayIndex 推算）
+    if (!this._current.days[dayIndex]?.date && this._current.weekStart) {
+      const d = new Date(this._current.weekStart);
+      d.setDate(d.getDate() + dayIndex);
+      data.date = formatDate(d);
+    }
     this._current.days[dayIndex] = {
       ...this._current.days[dayIndex],
       ...data,
