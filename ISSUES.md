@@ -35,16 +35,38 @@
 | D-023 | 创建新周 | 默认从上周复制 + 备选空白/模板，Modal 向导两屏完成 | - |
 | D-024 | GSAP动画规范 | Power2.easeOut / Power3.easeInOut 为主，duration≤0.4s，不用弹跳/旋转 | - |
 
-### 待办 / 已知问题
+### 2026-06-08 — Bug 修复记录
 
-- [ ] 01. 项目框架搭建：Vite + Vanilla JS + 目录结构
-- [ ] 02. Cursor 设计系统 CSS tokens 变量定义（tokens.css）
-- [ ] 03. 全局样式：base.css + components.css
-- [ ] 04. Markdown + YAML frontmatter 解析器（parser.js）
-- [ ] 05. 数据 → Markdown 写回（writer.js）
-- [ ] 06. 中央状态管理（store.js）
-- [ ] 07. File System Access API 封装（file.js）
-- [ ] 08. 日期工具函数（date.js）
+| # | 问题 | 根因 | 修复 |
+|---|------|------|------|
+| B-001 | 导入 Markdown 时 "Invalid time value" | parser.js 解析 weekStart 未校验 Date 有效性，Invalid Date 透传 | 4 层防御：parser/writer/drawer/store 加 `isNaN(d.getTime())` 守卫 |
+| B-002 | `formatDate is not defined` | drawer.js 使用 formatDate 但未 import | 补 import |
+| B-003 | start.bat 双击无反应 | UTF-8 中文在 CMD 中乱码导致命令解析失败 | 改为纯英文 |
+| B-004 | 打开文件后内容消失 | rawBody 保存但从未渲染，用户只看到 frontmatter 结构化数据 | 新增 BodyViewer 组件，渲染 Markdown→HTML |
+
+### 已完成
+
+- [x] 01. 项目框架搭建：Vite + Vanilla JS + 目录结构
+- [x] 02. Cursor 设计系统 CSS tokens 变量定义（tokens.css）
+- [x] 03. 全局样式：base.css + components.css
+- [x] 04. Markdown + YAML frontmatter 解析器（parser.js）
+- [x] 05. 数据 → Markdown 写回（writer.js）
+- [x] 06. 中央状态管理（store.js）
+- [x] 07. File System Access API 封装（file.js）
+- [x] 08. 日期工具函数（date.js）
+- [x] 09. 引导页：选择目录按钮 + onboarding
+- [x] 10. 周选择器组件：左右箭头翻页 + GSAP 翻页动画
+- [x] 11. 7 天时间表卡片：CSS Grid 响应式 + 日类型 Cursor 色映射 + 今日背景染色
+- [x] 12. 任务列表组件：内联编辑（点击变输入框，失焦保存）
+- [x] 13. 决策速查表组件
+- [x] 14. 风险列表组件
+- [x] 15. 抽屉菜单：迷你时间轴 + 操作按钮区
+- [x] 16. 创建新周 Modal：日期选择 + 来源选择（复制/空白/模板）
+- [x] 17. GSAP 入场动画（stagger 卡片淡入 + 任务逐行出现）
+- [x] 18. GSAP ScrollTrigger 滚动动画
+- [x] 19. GSAP 微交互（hover、勾选划线、翻页过渡）
+- [x] 20. 给 `week_plan_2026-06-08.md` 添加 YAML frontmatter
+- [x] 21. BodyViewer 组件：Markdown 正文渲染
 - [ ] 09. 引导页：选择目录按钮 + onboarding
 - [ ] 10. 周选择器组件：左右箭头翻页 + GSAP 翻页动画
 - [ ] 11. 7 天时间表卡片：CSS Grid 响应式 + 日类型 Cursor 色映射 + 今日背景染色
