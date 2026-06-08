@@ -4,7 +4,7 @@
  */
 
 import { store } from '../store.js';
-import { formatWeekRange } from '../utils/date.js';
+import { formatWeekRange, formatDate } from '../utils/date.js';
 import { parseWeekPlan } from '../parser.js';
 import { writeFile } from '../utils/file.js';
 import { generateMarkdown } from '../writer.js';
